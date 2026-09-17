@@ -1,0 +1,59 @@
+sudo mkdir -p /opt/jellyfin        # create the jellyfin directory 
+
+/opt/jellyfin/docker-compose.yml    # create dockerfile 
+
+How to start Jellyfin 
+
+Go to the Jellyfin Directory 
+
+cd /opt/jellfin
+
+sudo docker compose up -d
+
+Check:
+
+docker ps
+
+Jellyfin should appear as:
+
+jellyfin
+
+Check logs:
+
+docker logs jellyfin
+
+Or follow the logs:
+
+docker logs -f jellyfin
+
+Verify Jellyfin Can See the Movies
+
+Check the mounted directory:
+
+docker exec jellyfin ls -lah /movies
+
+You should see your movie directories/files.
+
+You can also run:
+
+docker exec jellyfin find /movies -maxdepth 2 -type f | head -20
+
+If the movies appear here, the Docker volume mapping is working.
+
+Verify GPU Access From Jellyfin
+
+Check:
+
+docker exec jellyfin ls -lah /dev/dri
+
+Expected:
+
+renderD128
+
+Also check the Jellyfin container's groups:
+
+docker exec jellyfin id
+
+The output should include the render group.
+
+This is important because simply seeing /dev/dri/renderD128 is not enough; Jellyfin also needs permission to use it.
