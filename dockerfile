@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   plex:
     image: linuxserver/plex:latest
@@ -15,7 +13,7 @@ services:
     volumes:
       - /root/docker/plex/config:/config         # Plex configuration
       - /root/docker/plex/tv:/data/tvshows       # TV shows
-      - /root/docker/plex/movies:/data/movies    # Movies
+      - /mnt/media/movies:/movies                # Movies
       - /root/docker/plex/music:/data/music      # Music
       - /root/docker/plex/transcode:/transcode   # Transcode temp files
     ports:
@@ -32,3 +30,31 @@ services:
 networks:
   nginx_proxy:
     external: true
+
+____________________________________________________________________________________________
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:12.0
+    container_name: jellyfin
+
+    networks:
+      - nginx_proxy
+
+    volumes:
+      - /opt/jellyfin/config:/config
+      - /opt/jellyfin/cache:/cache
+      - /mnt/media/movies:/movies:ro
+
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+
+    group_add:
+      - "109"
+
+    restart: unless-stopped
+
+networks:
+  nginx_proxy:
+    external: true
+
