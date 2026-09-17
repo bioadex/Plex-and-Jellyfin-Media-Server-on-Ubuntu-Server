@@ -57,3 +57,61 @@ docker exec jellyfin id
 The output should include the render group.
 
 This is important because simply seeing /dev/dri/renderD128 is not enough; Jellyfin also needs permission to use it.
+
+Optional Samba Access
+
+If movies are transferred from a Windows PC, Samba can also share:
+
+/mnt/media/movies
+
+Example Samba configuration:
+
+[Movies]
+   path = /mnt/media/movies
+   browseable = yes
+   read only = no
+   guest ok = no
+   create mask = 0664
+   directory mask = 0775
+
+After changing Samba configuration:
+
+sudo testparm
+
+If there are no configuration errors:
+
+sudo systemctl restart smbd
+
+Windows can then access the share using:
+
+\\SERVER-IP\Movies
+
+or the server hostname.
+
+Nginx Proxy Manager
+
+Because Jellyfin and Nginx Proxy Manager are connected to the same Docker network:
+
+nginx_proxy
+
+Nginx Proxy Manager can forward requests directly to:
+
+jellyfin:8096
+
+Create a Proxy Host similar to:
+
+Domain Names:
+jellyfin.example.com
+
+Scheme:
+http
+
+Forward Hostname/IP:
+jellyfin
+
+Forward Port:
+8096
+
+Then configure SSL using your preferred certificate provider.
+
+The important point is that NPM communicates with Jellyfin through the Docker network rather than requiring Jellyfin's port to be exposed directly to the Internet.
